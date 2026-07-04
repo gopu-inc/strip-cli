@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app>
+    <name>STRIP Streaming</name>
+    <version>1.0.0</version>
+    <author>CMO</author>
+    <bundle>com.strip.streaming</bundle>
+    <description>Application créée avec StoreApp.TUI</description>
+    <entrypoint>app.main:App</entrypoint>
+    <license>MIT</license>
+    <app-path>~/</app-path>
+    
+    <!-- Environnement d'exécution -->
+    <environnement>python</environnement>
+    <gestionnaire>pip install</gestionnaire>
+    
+    <!-- Dépendances -->
+    <dependencies>
+        <dependency>textual>=0.50.0</dependency>
+        <dependency>rich>=13.0.0</dependency>
+    </dependencies>
+    
+    <!-- Commande d'exécution -->
+    <app-run>cd @{app-path} && {gestionnaire} -e .</app-run>
+    
+    <!-- Cache et lock -->
+    <lock-cash-path>./cache/</lock-cash-path>
+    
+    <permissions>
+        <permission>notifications</permission>
+    </permissions>
+</app>

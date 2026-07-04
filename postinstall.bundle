@@ -1,0 +1,28 @@
+#!/bin/bash
+# postinstall.bundle - Script d'installation post-téléchargement
+
+echo "📦 Installation de STRIP Streaming..."
+
+# Définir l'environnement
+USE-ENV=PYTHON:3.12
+
+# Créer l'environnement virtuel
+python -m venv venv
+source venv/bin/activate
+
+# Installer les dépendances
+echo "📥 Installation des dépendances..."
+pip install --upgrade pip
+pip install -r requirements.tx
+pip install -e .
+
+# Télécharger les ressources NLTK
+echo "📚 Téléchargement des ressources NLTK..."
+python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+
+# Créer les dossiers nécessaires
+mkdir -p temp_uploads static/css static/js templates
+
+
+echo "✅ Installation terminée !"
+echo "🚀 Lancez avec: python strip"

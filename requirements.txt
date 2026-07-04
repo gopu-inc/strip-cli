@@ -1,0 +1,8 @@
+# requirements.txt pour STRIP TUI
+textual
+rich
+requests
+python-dotenv
+pydantic
+nltk
+numpy

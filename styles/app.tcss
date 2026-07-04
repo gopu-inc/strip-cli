@@ -1,0 +1,254 @@
+/* styles/app.tcss - Version finale corrigée */
+
+App {
+    background: $surface;
+}
+
+Header {
+    background: $primary;
+    color: $text;
+    height: 3;
+}
+
+Footer {
+    background: $panel;
+    color: $text;
+    height: 3;
+}
+
+Button {
+    margin: 1;
+    padding: 1 2;
+}
+
+Button.primary {
+    background: $primary;
+}
+
+Button.success {
+    background: $success;
+}
+
+Button.warning {
+    background: $warning;
+}
+
+Button.error {
+    background: $error;
+}
+
+Container {
+    padding: 1;
+}
+
+Horizontal {
+    padding: 0 1;
+}
+
+Vertical {
+    padding: 0 1;
+}
+
+Grid {
+    padding: 1;
+}
+
+Label.title {
+    text-style: bold;
+    color: $primary;
+    text-align: center;
+}
+
+Label.subtitle {
+    color: $text-muted;
+    text-align: center;
+}
+
+Input:focus {
+    border: solid $primary;
+}
+
+ListView {
+    background: $panel;
+}
+
+ListItem {
+    padding: 1;
+}
+
+/* Login */
+#login-box {
+    width: 50;
+    height: auto;
+    border: solid $primary;
+    padding: 2 3;
+    background: $surface;
+}
+
+/* Dashboard */
+#stats-grid {
+    grid-size: 3 2;
+    grid-gutter: 1 1;
+    margin: 1 1;
+    height: 10;
+}
+
+#stats-grid > Static {
+    border: solid $primary;
+    padding: 1;
+    background: $panel;
+    text-align: center;
+}
+
+#recent-activity {
+    margin: 1 1;
+    height: 1fr;
+    border: solid $secondary;
+    padding: 1;
+}
+
+#quick-actions {
+    height: 5;
+    margin: 1 1;
+}
+
+#quick-actions > Button {
+    margin: 0 1;
+    width: 20;
+}
+
+.welcome {
+    text-align: center;
+    padding: 1;
+}
+
+/* Headers */
+#feed-header, #chat-header, #live-header, #profile-header, #settings-header {
+    height: 3;
+    border-bottom: solid $primary;
+    padding: 0 1;
+}
+
+/* Feed */
+#feed-container {
+    height: 1fr;
+    margin: 1;
+    border: solid $secondary;
+}
+
+#feed-container ListItem {
+    padding: 1;
+    border-bottom: solid $panel;
+}
+
+#feed-actions {
+    height: 3;
+    padding: 0 1;
+}
+
+#feed-actions > Button {
+    margin: 0 1;
+    width: 15;
+}
+
+/* Chat */
+#chat-container {
+    height: 1fr;
+    margin: 1;
+    border: solid $secondary;
+}
+
+#chat-container ListItem {
+    padding: 1;
+    border-bottom: solid $panel;
+}
+
+#chat-input {
+    height: 3;
+    margin: 1;
+}
+
+#chat-input > Input {
+    width: 1fr;
+    margin: 0 1;
+}
+
+#chat-input > Button {
+    width: 15;
+}
+
+#chat-actions {
+    height: 3;
+    padding: 0 1;
+}
+
+#chat-actions > Button {
+    margin: 0 1;
+    width: 15;
+}
+
+/* Live */
+#live-container {
+    height: 1fr;
+    margin: 1;
+    border: solid $secondary;
+}
+
+#live-container ListItem {
+    padding: 1;
+    border-bottom: solid $panel;
+}
+
+#live-actions {
+    height: 3;
+    padding: 0 1;
+}
+
+#live-actions > Button {
+    margin: 0 1;
+    width: 15;
+}
+
+/* Profile */
+#profile-content {
+    margin: 2;
+    padding: 2;
+    border: solid $secondary;
+}
+
+#profile-content > Label {
+    padding: 1;
+}
+
+/* Settings */
+#settings-content {
+    margin: 2;
+    padding: 2;
+    border: solid $secondary;
+}
+
+#settings-content > Label {
+    padding: 1;
+}
+
+.setting-row {
+    padding: 1;
+}
+
+/* Status labels */
+#feed-status, #chat-status, #live-status {
+    text-align: right;
+    color: $text-muted;
+}
+
+#error {
+    color: $error;
+    text-align: center;
+    height: 3;
+}
+
+#status {
+    color: $success;
+    text-align: center;
+    height: 3;
+}
