@@ -1,441 +1,518 @@
 # screens/chat.py
-"""Messagerie améliorée avec recherche d'amis, messages vocaux et écran responsive"""
+"""Chat WhatsApp-style — STRIP TUI 2026"""
 
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import (
-    Label, Static, Button, ListView, ListItem, 
-    Input
-)
+from textual.widgets import Label, Static, Button, ListView, ListItem, Input, Rule
 from textual.containers import Horizontal, Vertical, Container
 from textual import events
 from rich.text import Text
-import time
+from datetime import datetime
 import base64
 from pathlib import Path
 
-class ChatUserItem(ListItem):
-    """Élément utilisateur dans la liste des amis"""
-    
-    def __init__(self, user_data):
-        super().__init__()
-        self.user_data = user_data
-        self.username = user_data.get('username', 'Inconnu')
-        self.is_online = user_data.get('is_online', False)
-        self.is_verified = user_data.get('is_verified', False)
-        self.last_message = user_data.get('last_message', '')
-        self.unread = user_data.get('unread_count', 0)
-    
-    def render(self) -> Text:
-        status = "🟢" if self.is_online else "🔴"
-        verified = "✅" if self.is_verified else ""
-        unread = f" [{self.unread}]" if self.unread > 0 else ""
-        msg = self.last_message[:30] + "..." if len(self.last_message) > 30 else self.last_message
-        
-        return Text(f"{status} {verified} {self.username}{unread}\n  {msg}")
 
-class MessageItem(ListItem):
-    """Élément message dans la conversation"""
-    
-    def __init__(self, message_data, is_mine=False):
+def _fmt_time(ts) -> str:
+    try:
+        if isinstance(ts, str):
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            return dt.strftime("%H:%M")
+        return ""
+    except Exception:
+        return ""
+
+
+class ConvItem(ListItem):
+    """Conversation dans la sidebar"""
+
+    def __init__(self, conv: dict):
         super().__init__()
-        self.message_data = message_data
-        self.is_mine = is_mine
-        self.content = message_data.get('content', '')
-        self.sender = message_data.get('sender_username', 'Inconnu')
-        self.created_at = message_data.get('created_at', '')
-        self.msg_type = message_data.get('type', 'text')
-    
+        self.conv = conv
+
     def render(self) -> Text:
-        align = "→" if self.is_mine else "←"
-        color = "green" if self.is_mine else "blue"
-        msg_type_icon = "🎤" if self.msg_type == "audio" else "✍️"
-        
-        return Text(f"{align} {self.sender}: {msg_type_icon} {self.content[:50]}", style=color)
+        c = self.conv
+        online = "🟢" if c.get("is_online") else "⚪"
+        verified = " ✅" if c.get("is_verified") else ""
+        uname = c.get("username", "?")
+        last_msg = (c.get("last_message") or "")[:35]
+        unread = c.get("unread_count", 0)
+        time_str = _fmt_time(c.get("last_message_time"))
+
+        t = Text()
+        t.append(f"{online} ", style="")
+        t.append(f"@{uname}", style="bold #e94560")
+        t.append(f"{verified}", style="#4dabf7")
+        if unread:
+            t.append(f"  [{unread}]", style="bold #51cf66")
+        t.append(f"\n   ", style="")
+        t.append(f"{last_msg}", style="#888")
+        if time_str:
+            t.append(f"  {time_str}", style="#555577")
+        return t
+
+
+class MsgItem(ListItem):
+    """Message dans la conversation"""
+
+    def __init__(self, msg: dict, is_mine: bool):
+        super().__init__()
+        self.msg = msg
+        self.is_mine = is_mine
+
+    def render(self) -> Text:
+        m = self.msg
+        content = m.get("content", "")
+        msg_type = m.get("type", "text")
+        time_str = _fmt_time(m.get("created_at"))
+        sender = m.get("sender_username", "")
+
+        t = Text()
+        if self.is_mine:
+            # Right-aligned style
+            if msg_type == "audio":
+                t.append("  🎤 ", style="bold")
+                t.append("Message vocal", style="#f59f00")
+            elif msg_type == "image":
+                t.append("  🖼 ", style="bold")
+                t.append("Image", style="#4dabf7")
+            elif msg_type == "video":
+                t.append("  📹 ", style="bold")
+                t.append("Vidéo", style="#845ef7")
+            else:
+                t.append(f"  {content}", style="#e0e0e0")
+            t.append(f"\n  {time_str} ✓✓", style="#555577")
+        else:
+            sender_label = f"@{sender}: " if sender else ""
+            if msg_type == "audio":
+                t.append(f"  {sender_label}", style="bold #4dabf7")
+                t.append("🎤 Message vocal", style="#f59f00")
+            elif msg_type == "image":
+                t.append(f"  {sender_label}", style="bold #4dabf7")
+                t.append("🖼 Image", style="#4dabf7")
+            else:
+                t.append(f"  {sender_label}", style="bold #4dabf7")
+                t.append(f"{content}", style="#c8e6ff")
+            t.append(f"\n  {time_str}", style="#555577")
+        return t
+
 
 class ChatScreen(Screen):
-    """Écran de messagerie amélioré"""
-    
+    """Chat WhatsApp-style"""
+
     CSS = """
     ChatScreen {
-        background: $surface;
+        background: $background;
     }
-    
+
     #chat-header {
         height: 3;
-        border-bottom: solid $primary;
-        padding: 0 1;
-        background: $panel;
+        background: #13131f;
+        border-bottom: solid #1e1e2e;
+        padding: 0 2;
     }
-    
-    #chat-header > Label {
+
+    #chat-title {
+        color: #e94560;
         text-style: bold;
+        width: 1fr;
     }
-    
+
+    #chat-status {
+        color: #555577;
+        text-align: right;
+        width: 25;
+    }
+
     #chat-body {
         height: 1fr;
-        padding: 0;
     }
-    
-    #friends-panel {
-        width: 35;
-        border-right: solid $secondary;
-        background: $panel;
-        overflow-y: auto;
+
+    /* ── Sidebar contacts ── */
+    #sidebar {
+        width: 30;
+        background: #0d0d18;
+        border-right: solid #1e1e2e;
     }
-    
-    #friends-panel > Input {
+
+    #sidebar-search {
         margin: 1;
     }
-    
-    #friends-list {
+
+    #contacts-label {
+        color: #4dabf7;
+        text-style: bold;
+        padding: 0 1;
+        height: 2;
+    }
+
+    #conv-list {
         height: 1fr;
-        margin: 0 1;
+        background: transparent;
     }
-    
-    #friends-list ListItem {
+
+    #conv-list ConvItem {
+        height: 5;
         padding: 1;
-        border-bottom: solid $panel;
+        border: none;
+        border-bottom: solid #1e1e2e;
+        background: transparent;
+        margin: 0;
     }
-    
-    #friends-list ListItem:hover {
-        background: $primary-darken-1;
+
+    #conv-list ConvItem:hover {
+        background: #13131f;
     }
-    
+
+    #conv-list ConvItem.--highlight {
+        background: #1a1a2a;
+        border-left: solid #e94560;
+    }
+
+    /* ── Chat panel ── */
     #chat-panel {
         width: 1fr;
-        background: $surface;
+        background: #0a0a0f;
     }
-    
-    #chat-messages {
+
+    #conversation-header {
+        height: 4;
+        background: #13131f;
+        border-bottom: solid #1e1e2e;
+        padding: 0 2;
+    }
+
+    #conv-username {
+        color: #e94560;
+        text-style: bold;
+        height: 2;
+    }
+
+    #conv-meta {
+        color: #555577;
+        height: 2;
+    }
+
+    #messages-area {
         height: 1fr;
-        margin: 0 1;
-        border: solid $secondary;
-        padding: 1;
         overflow-y: auto;
+        padding: 1 1;
     }
-    
-    #chat-messages ListItem {
-        padding: 1;
-        border-bottom: solid $panel;
+
+    #msg-list {
+        height: auto;
+        background: transparent;
     }
-    
-    #chat-input-area {
+
+    #msg-list MsgItem {
         height: 5;
-        margin: 1;
-        border-top: solid $secondary;
+        border: none;
+        background: transparent;
+        margin: 0 0 1 0;
+    }
+
+    #msg-list MsgItem.mine {
+        background: #13131f;
+        border-right: solid #e94560;
+        margin-left: 5;
+    }
+
+    #msg-list MsgItem.theirs {
+        background: #0d0d18;
+        border-left: solid #4dabf7;
+        margin-right: 5;
+    }
+
+    #input-area {
+        height: 5;
+        background: #13131f;
+        border-top: solid #1e1e2e;
         padding: 1;
     }
-    
-    #chat-input-area > Input {
+
+    #msg-input {
         width: 1fr;
-        margin: 0 1;
+        margin-right: 1;
     }
-    
-    #chat-input-area > Button {
-        width: 15;
-        margin: 0 1;
+
+    #btn-voice {
+        width: 5;
+        background: #1e1e2e;
     }
-    
-    #voice-recording {
+
+    #btn-send {
+        width: 12;
+    }
+
+    #voice-bar {
         height: 3;
-        margin: 1;
-        background: $error-darken-1;
-        padding: 1;
-        text-align: center;
+        background: #2a0010;
+        border-top: solid #e94560;
+        padding: 0 2;
         display: none;
     }
-    
-    #chat-actions {
-        height: 3;
-        padding: 0 1;
+
+    #voice-status {
+        width: 1fr;
+        color: #e94560;
     }
-    
-    #chat-actions > Button {
-        margin: 0 1;
-        width: 15;
+
+    #btn-stop-rec {
+        width: 12;
     }
-    
-    .status-bar {
-        color: $text-muted;
-        text-align: right;
-        padding: 0 1;
+
+    #no-conv {
+        width: 1fr;
+        align: center middle;
+        color: #333355;
+        text-align: center;
     }
-    
-    #current-chat-label {
-        text-style: bold;
-        color: $primary;
-        padding: 0 1;
-        height: 3;
+
+    #hint-bar {
+        color: #222244;
+        text-align: center;
+        height: 1;
+        background: #0d0d18;
     }
     """
-    
+
+    BINDINGS = [
+        ("escape", "back", "Retour"),
+        ("ctrl+r", "reload", "Rafraîchir"),
+    ]
+
     def __init__(self):
         super().__init__()
-        self.current_chat = None
-        self.friends = []
-        self.messages = []
+        self.current_chat_id = None
+        self.current_chat_username = ""
         self.is_recording = False
-        self.audio_file = None
         self.recording_timer = 0
-    
+        self._convs = []
+
     def compose(self) -> ComposeResult:
-        """Composition du chat amélioré"""
-        # Header
         with Horizontal(id="chat-header"):
-            yield Label("💬 Messagerie")
-            yield Label("", id="chat-status", classes="status-bar")
-        
-        # Body
+            yield Label("💬  Messagerie", id="chat-title")
+            yield Label("", id="chat-status")
+
         with Horizontal(id="chat-body"):
-            # Panneau des amis
-            with Vertical(id="friends-panel"):
-                yield Label("👥 Mes contacts", classes="subtitle")
-                yield Input(placeholder="🔍 Rechercher un ami...", id="search-friends")
-                yield ListView(id="friends-list")
-            
-            # Panneau de chat
+            # Sidebar
+            with Vertical(id="sidebar"):
+                yield Label("👥  Contacts", id="contacts-label")
+                yield Input(placeholder="🔍  Rechercher...", id="sidebar-search")
+                yield ListView(id="conv-list")
+
+            # Chat panel
             with Vertical(id="chat-panel"):
-                yield Label("", id="current-chat-label")
-                with Container(id="chat-messages"):
-                    yield ListView(id="messages-list")
-                
-                # Zone d'enregistrement vocal
-                with Container(id="voice-recording"):
-                    yield Label("🎤 Enregistrement en cours...", id="recording-status")
-                    yield Button("⏹ Arrêter", id="stop-recording", variant="error")
-                
-                # Zone de saisie
-                with Horizontal(id="chat-input-area"):
-                    yield Input(placeholder="Tapez votre message...", id="message-input")
-                    yield Button("🎤", id="voice-record", variant="warning")
-                    yield Button("📤 Envoyer", id="send-message", variant="primary")
-        
-        # Actions
-        with Horizontal(id="chat-actions"):
-            yield Button("🔄 Rafraîchir", id="refresh-chat")
-            yield Button("🔙 Retour", id="back-dashboard", variant="primary")
-    
+                # Header conversation
+                with Container(id="conversation-header"):
+                    yield Label("", id="conv-username")
+                    yield Label("Sélectionnez une conversation", id="conv-meta")
+
+                # Messages
+                with Container(id="messages-area"):
+                    yield Static(
+                        "💬\n\nSélectionnez un contact\npour commencer à discuter",
+                        id="no-conv",
+                    )
+                    yield ListView(id="msg-list")
+
+                # Zone vocal active
+                with Horizontal(id="voice-bar"):
+                    yield Label("🔴  Enregistrement vocal...", id="voice-status")
+                    yield Button("⏹  Arrêter", id="btn-stop-rec", variant="error")
+
+                # Input
+                with Horizontal(id="input-area"):
+                    yield Input(placeholder="Tapez votre message...", id="msg-input")
+                    yield Button("🎤", id="btn-voice")
+                    yield Button("📤 Envoyer", id="btn-send", variant="primary")
+
+        yield Static(
+            "  Tab  navigation  •  Entrée  envoyer  •  Ctrl+R  rafraîchir  •  Esc  retour",
+            id="hint-bar",
+        )
+
     def on_mount(self) -> None:
-        """Chargement au montage"""
-        self.load_friends()
-        self.query_one("#search-friends").focus()
-    
+        self.load_conversations()
+        self.query_one("#sidebar-search").focus()
+
+    def action_back(self) -> None:
+        self.app.pop_screen()
+
+    def action_reload(self) -> None:
+        self.load_conversations()
+        if self.current_chat_id:
+            self.load_messages(self.current_chat_id)
+
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        """Soumission d'un champ input"""
-        if event.input.id == "search-friends":
-            self.search_friends(event.input.value)
-        elif event.input.id == "message-input":
-            self.send_message()
-    
+        if event.input.id == "sidebar-search":
+            self.search_contacts(event.input.value)
+        elif event.input.id == "msg-input":
+            self.send_text_message()
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Clic sur un bouton"""
-        btn_id = event.button.id
-        
-        if btn_id == "refresh-chat":
-            self.load_friends()
-            if self.current_chat:
-                self.load_messages(self.current_chat)
-        elif btn_id == "back-dashboard":
-            self.app.pop_screen()
-        elif btn_id == "send-message":
-            self.send_message()
-        elif btn_id == "voice-record":
+        bid = event.button.id
+        if bid == "btn-send":
+            self.send_text_message()
+        elif bid == "btn-voice":
             self.toggle_recording()
-        elif btn_id == "stop-recording":
+        elif bid == "btn-stop-rec":
             self.stop_recording()
-    
+
     def on_list_view_selected(self, event: ListView.Selected) -> None:
-        """Sélection d'un ami"""
         item = event.item
-        if hasattr(item, 'user_data'):
-            user_id = item.user_data.get('id')
-            username = item.user_data.get('username')
-            self.current_chat = user_id
-            self.query_one("#current-chat-label").update(f"💬 Conversation avec {username}")
-            self.load_messages(user_id)
-            self.query_one("#message-input").focus()
-    
-    def load_friends(self) -> None:
-        """Charge la liste des amis"""
-        self.query_one("#friends-list").clear()
-        self.query_one("#chat-status").update("🔄 Chargement des contacts...")
-        
+        if hasattr(item, "conv"):
+            c = item.conv
+            self.current_chat_id = c.get("user_id") or c.get("id")
+            self.current_chat_username = c.get("username", "")
+            # Update header
+            verified = " ✅" if c.get("is_verified") else ""
+            online = "🟢 En ligne" if c.get("is_online") else "⚪ Hors ligne"
+            self.query_one("#conv-username").update(
+                f"@{self.current_chat_username}{verified}"
+            )
+            self.query_one("#conv-meta").update(online)
+            # Hide no-conv placeholder
+            self.query_one("#no-conv").styles.display = "none"
+            # Load messages
+            self.load_messages(self.current_chat_id)
+            self.query_one("#msg-input").focus()
+
+    def load_conversations(self) -> None:
+        lv = self.query_one("#conv-list", ListView)
+        lv.clear()
+        self._convs = []
+        self.query_one("#chat-status").update("🔄  Chargement...")
         try:
-            conversations = self.app.api.get("/api/messages/conversations", 
-                                           token=self.app.auth.token)
-            
-            if conversations:
-                list_view = self.query_one("#friends-list")
-                for conv in conversations:
-                    item = ChatUserItem(conv)
-                    list_view.append(item)
-                    self.friends.append(conv)
-                self.query_one("#chat-status").update(f"✅ {len(conversations)} contacts")
+            convs = self.app.api.get_conversations(self.app.auth.token) or []
+            self._convs = convs
+            if convs:
+                for c in convs:
+                    lv.append(ConvItem(c))
+                self.query_one("#chat-status").update(f"✅  {len(convs)} contacts")
             else:
-                self.query_one("#chat-status").update("📭 Aucun contact")
-                
-        except Exception as e:
-            self.query_one("#chat-status").update(f"❌ Erreur: {e}")
-    
-    def search_friends(self, query: str) -> None:
-        """Recherche d'amis"""
+                lv.append(ListItem(Static("  📭  Aucune conversation")))
+                self.query_one("#chat-status").update("📭  Vide")
+        except Exception:
+            self.query_one("#chat-status").update("❌  Erreur réseau")
+
+    def search_contacts(self, query: str) -> None:
         if not query or len(query) < 2:
-            self.load_friends()
+            self.load_conversations()
             return
-        
-        self.query_one("#friends-list").clear()
-        self.query_one("#chat-status").update(f"🔍 Recherche: {query}")
-        
+        lv = self.query_one("#conv-list", ListView)
+        lv.clear()
         try:
-            results = self.app.api.search(query, token=self.app.auth.token)
-            
-            if results and results.get('results'):
-                list_view = self.query_one("#friends-list")
-                for user in results['results'][:20]:
-                    item = ChatUserItem(user)
-                    list_view.append(item)
-                self.query_one("#chat-status").update(f"✅ {len(results['results'])} résultats")
+            results = self.app.api.search(query, "users", self.app.auth.token) or {}
+            users = results.get("results", [])
+            if users:
+                for u in users[:15]:
+                    lv.append(ConvItem(u))
+                self.query_one("#chat-status").update(f"🔍  {len(users)} résultats")
             else:
-                self.query_one("#chat-status").update("❌ Aucun résultat")
-                
-        except Exception as e:
-            self.query_one("#chat-status").update(f"❌ Erreur: {e}")
-    
+                lv.append(ListItem(Static("  ❌  Aucun résultat")))
+        except Exception:
+            self.query_one("#chat-status").update("❌  Erreur")
+
     def load_messages(self, user_id: str) -> None:
-        """Charge les messages d'une conversation"""
-        self.query_one("#messages-list").clear()
-        self.query_one("#chat-status").update("🔄 Chargement des messages...")
-        
+        lv = self.query_one("#msg-list", ListView)
+        lv.clear()
+        self.query_one("#chat-status").update("🔄  Messages...")
         try:
-            messages = self.app.api.get(f"/api/messages/{user_id}?limit=50", 
-                                      token=self.app.auth.token)
-            
-            if messages:
-                list_view = self.query_one("#messages-list")
-                current_user_id = self.app.auth.get_user_id()
-                
-                for msg in messages:
-                    is_mine = msg.get('sender_id') == current_user_id
-                    item = MessageItem(msg, is_mine)
-                    list_view.append(item)
-                
-                self.query_one("#chat-status").update(f"✅ {len(messages)} messages")
-                list_view.scroll_end()
+            msgs = self.app.api.get_messages(user_id, self.app.auth.token) or []
+            my_id = self.app.auth.get_user_id() or ""
+            if msgs:
+                for m in msgs:
+                    is_mine = m.get("sender_id") == my_id
+                    item = MsgItem(m, is_mine)
+                    if is_mine:
+                        item.add_class("mine")
+                    else:
+                        item.add_class("theirs")
+                    lv.append(item)
+                lv.scroll_end()
+                self.query_one("#chat-status").update(f"✅  {len(msgs)} messages")
             else:
-                self.query_one("#chat-status").update("📭 Aucun message")
-                
-        except Exception as e:
-            self.query_one("#chat-status").update(f"❌ Erreur: {e}")
-    
-    def send_message(self) -> None:
-        """Envoie un message"""
-        if not self.current_chat:
-            self.query_one("#chat-status").update("⚠️ Sélectionnez un contact")
+                lv.append(ListItem(Static("  📭  Aucun message\n  Envoyez le premier !")))
+                self.query_one("#chat-status").update("📭  Vide")
+        except Exception:
+            self.query_one("#chat-status").update("❌  Erreur")
+
+    def send_text_message(self) -> None:
+        if not self.current_chat_id:
+            self.query_one("#chat-status").update("⚠️  Sélectionnez un contact")
             return
-        
-        input_widget = self.query_one("#message-input")
-        message = input_widget.value.strip()
-        
-        if not message:
+        inp = self.query_one("#msg-input", Input)
+        content = inp.value.strip()
+        if not content:
             return
-        
-        self.query_one("#chat-status").update("📤 Envoi en cours...")
-        
+        self.query_one("#chat-status").update("📤  Envoi...")
         try:
-            result = self.app.api.post("/api/messages/send",
-                                     data={
-                                         "receiver_id": self.current_chat,
-                                         "content": message
-                                     },
-                                     token=self.app.auth.token)
-            
-            if result:
-                input_widget.value = ""
-                self.query_one("#chat-status").update("✅ Message envoyé")
-                self.load_messages(self.current_chat)
+            result = self.app.api.send_message(
+                self.current_chat_id, content, token=self.app.auth.token
+            )
+            if result is not None:
+                inp.value = ""
+                self.query_one("#chat-status").update("✅  Envoyé")
+                self.load_messages(self.current_chat_id)
             else:
-                self.query_one("#chat-status").update("❌ Échec de l'envoi")
-                
-        except Exception as e:
-            self.query_one("#chat-status").update(f"❌ Erreur: {e}")
-    
+                self.query_one("#chat-status").update("❌  Échec d'envoi")
+        except Exception:
+            self.query_one("#chat-status").update("❌  Erreur réseau")
+
     def toggle_recording(self) -> None:
-        """Active/désactive l'enregistrement vocal"""
-        if not self.current_chat:
-            self.query_one("#chat-status").update("⚠️ Sélectionnez un contact")
+        if not self.current_chat_id:
+            self.query_one("#chat-status").update("⚠️  Sélectionnez un contact")
             return
-        
         if not self.is_recording:
             self.start_recording()
         else:
             self.stop_recording()
-    
+
     def start_recording(self) -> None:
-        """Démarre l'enregistrement vocal"""
         self.is_recording = True
-        self.query_one("#voice-recording").styles.display = "block"
-        self.query_one("#recording-status").update("🎤 Enregistrement en cours...")
-        self.query_one("#chat-status").update("🔴 Enregistrement vocal...")
-        
-        self.audio_file = Path("/tmp/voice_message.wav")
-        self.audio_file.touch()
         self.recording_timer = 0
-        
-        def update_recording():
+        self.query_one("#voice-bar").styles.display = "block"
+        self.query_one("#btn-voice").label = "🔴"
+        self.query_one("#chat-status").update("🔴  Enregistrement vocal...")
+
+        audio_file = Path("/tmp/strip_voice.wav")
+        audio_file.touch()
+        self._audio_path = audio_file
+
+        def _tick():
             if self.is_recording:
                 self.recording_timer += 1
-                self.query_one("#recording-status").update(f"🎤 Enregistrement... {self.recording_timer}s")
-                self.set_timer(1, update_recording)
-        
-        self.set_timer(1, update_recording)
-    
+                try:
+                    self.query_one("#voice-status").update(
+                        f"🔴  Enregistrement... {self.recording_timer}s"
+                    )
+                    self.set_timer(1.0, _tick)
+                except Exception:
+                    pass
+
+        self.set_timer(1.0, _tick)
+
     def stop_recording(self) -> None:
-        """Arrête l'enregistrement vocal"""
         self.is_recording = False
-        self.query_one("#voice-recording").styles.display = "none"
-        self.query_one("#chat-status").update("⏹ Enregistrement terminé")
-        
-        if self.audio_file and self.audio_file.exists():
-            self.send_voice_message()
-    
-    def send_voice_message(self) -> None:
-        """Envoie un message vocal"""
-        if not self.current_chat:
-            return
-        
-        self.query_one("#chat-status").update("📤 Envoi du vocal...")
-        
+        self.query_one("#voice-bar").styles.display = "none"
+        self.query_one("#btn-voice").label = "🎤"
+        self.query_one("#chat-status").update(
+            f"⏹  Vocal {self.recording_timer}s — envoi..."
+        )
+        self._send_voice_message()
+
+    def _send_voice_message(self) -> None:
         try:
-            if self.audio_file and self.audio_file.exists():
-                with open(self.audio_file, 'rb') as f:
-                    audio_data = base64.b64encode(f.read()).decode()
-                
-                self.app.api.post("/api/messages/send",
-                                data={
-                                    "receiver_id": self.current_chat,
-                                    "content": "[Message vocal]",
-                                    "type": "audio"
-                                },
-                                token=self.app.auth.token)
-                
-                self.query_one("#chat-status").update("✅ Vocal envoyé")
-                self.load_messages(self.current_chat)
-                
-                if self.audio_file and self.audio_file.exists():
-                    self.audio_file.unlink()
-                self.audio_file = None
-                
-        except Exception as e:
-            self.query_one("#chat-status").update(f"❌ Erreur vocal: {e}")
-    
-    def on_key(self, event: events.Key) -> None:
-        """Gestion des touches rapides"""
-        if event.key == "escape":
-            self.app.pop_screen()
-        elif event.key == "enter" and self.query_one("#message-input").has_focus:
-            self.send_message()
-        elif event.key == "ctrl+r":
-            self.load_friends()
-            if self.current_chat:
-                self.load_messages(self.current_chat)
+            result = self.app.api.send_message(
+                self.current_chat_id,
+                f"[Message vocal — {self.recording_timer}s]",
+                msg_type="audio",
+                token=self.app.auth.token,
+            )
+            if result is not None:
+                self.query_one("#chat-status").update("✅  Vocal envoyé")
+                self.load_messages(self.current_chat_id)
+            else:
+                self.query_one("#chat-status").update("❌  Échec vocal")
+        except Exception:
+            self.query_one("#chat-status").update("❌  Erreur vocal")

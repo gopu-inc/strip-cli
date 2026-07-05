@@ -1,254 +1,1192 @@
-/* styles/app.tcss - Version finale corrigée */
+/* ═══════════════════════════════════════════════════════════════════════════
+   STRIP TUI — Feuille de style principale
+   Thèmes: dark (défaut), cyber, ocean, sunset
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
 
 App {
-    background: $surface;
+    background: #0a0a0f;
+}
+
+Screen {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    layers: base overlay;
 }
 
 Header {
-    background: $primary;
-    color: $text;
-    height: 3;
+    background: #13131f;
+    color: #e94560;
+    height: 1;
+    text-style: bold;
 }
 
 Footer {
-    background: $panel;
-    color: $text;
-    height: 3;
+    background: #13131f;
+    color: #555577;
+    height: 1;
 }
 
-Button {
-    margin: 1;
-    padding: 1 2;
-}
-
-Button.primary {
-    background: $primary;
-}
-
-Button.success {
-    background: $success;
-}
-
-Button.warning {
-    background: $warning;
-}
-
-Button.error {
-    background: $error;
-}
-
-Container {
-    padding: 1;
-}
-
-Horizontal {
-    padding: 0 1;
-}
-
-Vertical {
-    padding: 0 1;
-}
-
-Grid {
-    padding: 1;
-}
+/* ─── Typographie globale ─────────────────────────────────────────────────── */
 
 Label.title {
     text-style: bold;
-    color: $primary;
+    color: #e94560;
     text-align: center;
 }
 
 Label.subtitle {
-    color: $text-muted;
+    color: #888;
     text-align: center;
+}
+
+Label.section-title {
+    text-style: bold;
+    color: #4dabf7;
+    padding: 0 1;
+}
+
+Label.muted {
+    color: #555577;
+}
+
+Label.success {
+    color: #51cf66;
+}
+
+Label.error {
+    color: #ff6b6b;
+}
+
+Label.warning {
+    color: #f59f00;
+}
+
+Label.online {
+    color: #51cf66;
+}
+
+Label.verified {
+    color: #4dabf7;
+}
+
+/* ─── Boutons ─────────────────────────────────────────────────────────────── */
+
+Button {
+    margin: 0 1;
+    padding: 0 2;
+    border: none;
+    background: #1e1e2e;
+    color: #e0e0e0;
+    height: 3;
+}
+
+Button:hover {
+    background: #2a2a3e;
+}
+
+Button:focus {
+    border: solid #e94560;
+}
+
+Button.-primary {
+    background: #e94560;
+    color: #fff;
+}
+
+Button.-primary:hover {
+    background: #c73652;
+}
+
+Button.-success {
+    background: #51cf66;
+    color: #000;
+}
+
+Button.-success:hover {
+    background: #3eb554;
+}
+
+Button.-warning {
+    background: #f59f00;
+    color: #000;
+}
+
+Button.-error {
+    background: #ff6b6b;
+    color: #fff;
+}
+
+Button.nav-btn {
+    background: #13131f;
+    color: #555577;
+    width: 1fr;
+    height: 3;
+    border: none;
+    margin: 0;
+}
+
+Button.nav-btn:hover {
+    background: #1e1e2e;
+    color: #e0e0e0;
+}
+
+Button.nav-active {
+    background: #1e1e2e;
+    color: #e94560;
+}
+
+Button.action-btn {
+    background: transparent;
+    color: #888;
+    min-width: 8;
+    height: 1;
+    padding: 0 1;
+    margin: 0;
+    border: none;
+}
+
+Button.action-btn:hover {
+    color: #e94560;
+}
+
+Button.liked {
+    color: #e94560;
+}
+
+/* ─── Inputs ──────────────────────────────────────────────────────────────── */
+
+Input {
+    background: #13131f;
+    border: solid #2a2a3e;
+    color: #e0e0e0;
+    padding: 0 1;
 }
 
 Input:focus {
-    border: solid $primary;
+    border: solid #e94560;
+    background: #16161f;
 }
 
+Input.-valid {
+    border: solid #51cf66;
+}
+
+/* ─── Conteneurs ──────────────────────────────────────────────────────────── */
+
+#nav-bar {
+    height: 3;
+    background: #0d0d18;
+    border-top: solid #1e1e2e;
+    dock: bottom;
+    padding: 0;
+}
+
+.panel {
+    background: #13131f;
+    border: solid #1e1e2e;
+    padding: 1;
+}
+
+.card {
+    background: #13131f;
+    border: solid #1e1e2e;
+    padding: 1;
+    margin: 0 0 1 0;
+}
+
+.card:hover {
+    border: solid #e94560;
+}
+
+/* ─── ListView ────────────────────────────────────────────────────────────── */
+
 ListView {
-    background: $panel;
+    background: transparent;
+    border: none;
 }
 
 ListItem {
+    background: #13131f;
+    padding: 1;
+    margin: 0 0 1 0;
+    border: solid #1e1e2e;
+}
+
+ListItem:hover {
+    background: #1a1a2a;
+    border: solid #e94560;
+}
+
+ListItem.--highlight {
+    background: #1e1e2e;
+    border: solid #e94560;
+}
+
+/* ─── Switch ──────────────────────────────────────────────────────────────── */
+
+Switch {
+    background: #1e1e2e;
+}
+
+Switch.-on {
+    background: #e94560;
+}
+
+/* ─── Rule ────────────────────────────────────────────────────────────────── */
+
+Rule {
+    color: #2a2a3e;
+    margin: 1 0;
+}
+
+/* ─── LoadingIndicator ────────────────────────────────────────────────────── */
+
+LoadingIndicator {
+    color: #e94560;
+}
+
+/* ─── DataTable ───────────────────────────────────────────────────────────── */
+
+DataTable {
+    background: #13131f;
+    border: solid #1e1e2e;
+    color: #e0e0e0;
+}
+
+DataTable > .datatable--header {
+    background: #1e1e2e;
+    color: #e94560;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #e94560;
+    color: #fff;
+}
+
+/* ─── Tabs / TabbedContent ────────────────────────────────────────────────── */
+
+Tabs {
+    background: #0d0d18;
+    border-bottom: solid #1e1e2e;
+}
+
+Tab {
+    background: transparent;
+    color: #555577;
+    padding: 1 2;
+}
+
+Tab.-active {
+    color: #e94560;
+    border-bottom: solid #e94560;
+    background: #13131f;
+}
+
+Tab:hover {
+    color: #e0e0e0;
+}
+
+TabbedContent {
+    background: #0a0a0f;
+}
+
+TabPane {
+    background: #0a0a0f;
     padding: 1;
 }
 
-/* Login */
-#login-box {
-    width: 50;
-    height: auto;
-    border: solid $primary;
-    padding: 2 3;
-    background: $surface;
+/* ─── ProgressBar ─────────────────────────────────────────────────────────── */
+
+ProgressBar {
+    color: #e94560;
 }
 
-/* Dashboard */
-#stats-grid {
-    grid-size: 3 2;
-    grid-gutter: 1 1;
-    margin: 1 1;
-    height: 10;
+ProgressBar > .bar--bar {
+    color: #e94560;
 }
 
-#stats-grid > Static {
-    border: solid $primary;
-    padding: 1;
-    background: $panel;
-    text-align: center;
+/* ─── Markdown ────────────────────────────────────────────────────────────── */
+
+Markdown {
+    background: transparent;
+    color: #e0e0e0;
 }
 
-#recent-activity {
-    margin: 1 1;
-    height: 1fr;
-    border: solid $secondary;
-    padding: 1;
+/* Textual CSS does not support descendant/child selectors — heading/code
+   colours are handled per-theme via MarkdownH1 / MarkdownFence widgets */
+MarkdownH1 {
+    color: #e94560;
+}
+MarkdownH2 {
+    color: #e94560;
+}
+MarkdownH3 {
+    color: #e94560;
+}
+MarkdownFence {
+    background: #1e1e2e;
 }
 
-#quick-actions {
-    height: 5;
-    margin: 1 1;
+/* ═══════════════════════════════════════════════════════════════════════════
+   THÈME: CYBER (matrix green)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+App.theme-cyber {
+    background: #000d00;
 }
 
-#quick-actions > Button {
-    margin: 0 1;
-    width: 20;
+App.theme-cyber Screen {
+    background: #000d00;
+    color: #b0ffb0;
 }
 
-.welcome {
-    text-align: center;
-    padding: 1;
+App.theme-cyber Header {
+    background: #001500;
+    color: #00ff41;
 }
 
-/* Headers */
-#feed-header, #chat-header, #live-header, #profile-header, #settings-header {
-    height: 3;
-    border-bottom: solid $primary;
-    padding: 0 1;
+App.theme-cyber Footer {
+    background: #001500;
+    color: #005500;
 }
 
-/* Feed */
-#feed-container {
-    height: 1fr;
-    margin: 1;
-    border: solid $secondary;
+App.theme-cyber Label.title {
+    color: #00ff41;
 }
 
-#feed-container ListItem {
-    padding: 1;
-    border-bottom: solid $panel;
+App.theme-cyber Label.section-title {
+    color: #00cc33;
 }
 
-#feed-actions {
-    height: 3;
-    padding: 0 1;
+App.theme-cyber Button {
+    background: #001500;
+    color: #b0ffb0;
 }
 
-#feed-actions > Button {
-    margin: 0 1;
-    width: 15;
+App.theme-cyber Button.-primary {
+    background: #00ff41;
+    color: #000;
 }
 
-/* Chat */
-#chat-container {
-    height: 1fr;
-    margin: 1;
-    border: solid $secondary;
+App.theme-cyber Button.nav-btn {
+    background: #001500;
+    color: #005500;
 }
 
-#chat-container ListItem {
-    padding: 1;
-    border-bottom: solid $panel;
+App.theme-cyber Button.nav-active {
+    color: #00ff41;
 }
 
-#chat-input {
-    height: 3;
-    margin: 1;
+App.theme-cyber Button.action-btn:hover {
+    color: #00ff41;
 }
 
-#chat-input > Input {
-    width: 1fr;
-    margin: 0 1;
+App.theme-cyber Input {
+    background: #001500;
+    border: solid #003300;
+    color: #b0ffb0;
 }
 
-#chat-input > Button {
-    width: 15;
+App.theme-cyber Input:focus {
+    border: solid #00ff41;
 }
 
-#chat-actions {
-    height: 3;
-    padding: 0 1;
+App.theme-cyber ListItem {
+    background: #001500;
+    border: solid #003300;
 }
 
-#chat-actions > Button {
-    margin: 0 1;
-    width: 15;
+App.theme-cyber ListItem:hover {
+    background: #002200;
+    border: solid #00ff41;
 }
 
-/* Live */
-#live-container {
-    height: 1fr;
-    margin: 1;
-    border: solid $secondary;
+App.theme-cyber .panel {
+    background: #001500;
+    border: solid #003300;
 }
 
-#live-container ListItem {
-    padding: 1;
-    border-bottom: solid $panel;
+App.theme-cyber .card {
+    background: #001500;
+    border: solid #003300;
 }
 
-#live-actions {
-    height: 3;
-    padding: 0 1;
+App.theme-cyber .card:hover {
+    border: solid #00ff41;
 }
 
-#live-actions > Button {
-    margin: 0 1;
-    width: 15;
+App.theme-cyber Tab.-active {
+    color: #00ff41;
+    border-bottom: solid #00ff41;
+    background: #001500;
 }
 
-/* Profile */
-#profile-content {
-    margin: 2;
-    padding: 2;
-    border: solid $secondary;
+App.theme-cyber #nav-bar {
+    background: #000d00;
+    border-top: solid #003300;
 }
 
-#profile-content > Label {
-    padding: 1;
+App.theme-cyber DataTable > .datatable--header {
+    background: #003300;
+    color: #00ff41;
 }
 
-/* Settings */
-#settings-content {
-    margin: 2;
-    padding: 2;
-    border: solid $secondary;
+App.theme-cyber DataTable > .datatable--cursor {
+    background: #00ff41;
+    color: #000;
 }
 
-#settings-content > Label {
-    padding: 1;
+App.theme-cyber Switch.-on {
+    background: #00ff41;
 }
 
-.setting-row {
-    padding: 1;
+/* ═══════════════════════════════════════════════════════════════════════════
+   THÈME: OCEAN (deep blue)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+App.theme-ocean {
+    background: #010b1a;
 }
 
-/* Status labels */
-#feed-status, #chat-status, #live-status {
-    text-align: right;
-    color: $text-muted;
+App.theme-ocean Screen {
+    background: #010b1a;
+    color: #c8e6ff;
 }
 
-#error {
-    color: $error;
-    text-align: center;
-    height: 3;
+App.theme-ocean Header {
+    background: #021024;
+    color: #4dabf7;
 }
 
-#status {
-    color: $success;
-    text-align: center;
-    height: 3;
+App.theme-ocean Footer {
+    background: #021024;
+    color: #1a3a5c;
 }
+
+App.theme-ocean Label.title {
+    color: #4dabf7;
+}
+
+App.theme-ocean Label.section-title {
+    color: #00e5ff;
+}
+
+App.theme-ocean Button {
+    background: #021024;
+    color: #c8e6ff;
+}
+
+App.theme-ocean Button.-primary {
+    background: #4dabf7;
+    color: #000;
+}
+
+App.theme-ocean Button.nav-btn {
+    background: #021024;
+    color: #1a3a5c;
+}
+
+App.theme-ocean Button.nav-active {
+    color: #4dabf7;
+}
+
+App.theme-ocean Button.action-btn:hover {
+    color: #4dabf7;
+}
+
+App.theme-ocean Input {
+    background: #021024;
+    border: solid #0a2a4a;
+    color: #c8e6ff;
+}
+
+App.theme-ocean Input:focus {
+    border: solid #4dabf7;
+}
+
+App.theme-ocean ListItem {
+    background: #021024;
+    border: solid #0a2a4a;
+}
+
+App.theme-ocean ListItem:hover {
+    background: #041830;
+    border: solid #4dabf7;
+}
+
+App.theme-ocean .panel {
+    background: #021024;
+    border: solid #0a2a4a;
+}
+
+App.theme-ocean .card {
+    background: #021024;
+    border: solid #0a2a4a;
+}
+
+App.theme-ocean .card:hover {
+    border: solid #4dabf7;
+}
+
+App.theme-ocean Tab.-active {
+    color: #4dabf7;
+    border-bottom: solid #4dabf7;
+    background: #021024;
+}
+
+App.theme-ocean #nav-bar {
+    background: #010b1a;
+    border-top: solid #0a2a4a;
+}
+
+App.theme-ocean DataTable > .datatable--header {
+    background: #0a2a4a;
+    color: #4dabf7;
+}
+
+App.theme-ocean DataTable > .datatable--cursor {
+    background: #4dabf7;
+    color: #000;
+}
+
+App.theme-ocean Switch.-on {
+    background: #4dabf7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THÈME: SUNSET (warm amber/purple)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+App.theme-sunset {
+    background: #100a1a;
+}
+
+App.theme-sunset Screen {
+    background: #100a1a;
+    color: #ffe4b5;
+}
+
+App.theme-sunset Header {
+    background: #190e22;
+    color: #f59f00;
+}
+
+App.theme-sunset Footer {
+    background: #190e22;
+    color: #4a3060;
+}
+
+App.theme-sunset Label.title {
+    color: #f59f00;
+}
+
+App.theme-sunset Label.section-title {
+    color: #845ef7;
+}
+
+App.theme-sunset Button {
+    background: #190e22;
+    color: #ffe4b5;
+}
+
+App.theme-sunset Button.-primary {
+    background: #f59f00;
+    color: #000;
+}
+
+App.theme-sunset Button.nav-btn {
+    background: #190e22;
+    color: #4a3060;
+}
+
+App.theme-sunset Button.nav-active {
+    color: #f59f00;
+}
+
+App.theme-sunset Button.action-btn:hover {
+    color: #f59f00;
+}
+
+App.theme-sunset Input {
+    background: #190e22;
+    border: solid #2a1a3a;
+    color: #ffe4b5;
+}
+
+App.theme-sunset Input:focus {
+    border: solid #f59f00;
+}
+
+App.theme-sunset ListItem {
+    background: #190e22;
+    border: solid #2a1a3a;
+}
+
+App.theme-sunset ListItem:hover {
+    background: #201228;
+    border: solid #f59f00;
+}
+
+App.theme-sunset .panel {
+    background: #190e22;
+    border: solid #2a1a3a;
+}
+
+App.theme-sunset .card {
+    background: #190e22;
+    border: solid #2a1a3a;
+}
+
+App.theme-sunset .card:hover {
+    border: solid #f59f00;
+}
+
+App.theme-sunset Tab.-active {
+    color: #f59f00;
+    border-bottom: solid #f59f00;
+    background: #190e22;
+}
+
+App.theme-sunset #nav-bar {
+    background: #100a1a;
+    border-top: solid #2a1a3a;
+}
+
+App.theme-sunset DataTable > .datatable--header {
+    background: #2a1a3a;
+    color: #f59f00;
+}
+
+App.theme-sunset DataTable > .datatable--cursor {
+    background: #f59f00;
+    color: #000;
+}
+
+App.theme-sunset Switch.-on {
+    background: #f59f00;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PER-SCREEN THEME OVERRIDES
+   Covers every hardcoded hex in screen CSS strings so themes apply globally.
+   Panel bg  = #13131f  │  Dark bg  = #0d0d18 / #0a0a0f
+   Border    = #1e1e2e  │  Hover bg = #16161f
+   Primary   = #e94560  │  Secondary = #4dabf7
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── CYBER per-screen ─────────────────────────────────────────────────────── */
+
+/* Panel / header backgrounds */
+App.theme-cyber #dash-header,
+App.theme-cyber StatCard,
+App.theme-cyber #add-story-btn,
+App.theme-cyber #feed-header,
+App.theme-cyber VideoCard,
+App.theme-cyber #feed-bottom,
+App.theme-cyber #chat-header,
+App.theme-cyber #conversation-header,
+App.theme-cyber #input-area,
+App.theme-cyber #af-header,
+App.theme-cyber PostCard,
+App.theme-cyber #viewer-header,
+App.theme-cyber #viewer-actions,
+App.theme-cyber #write-header,
+App.theme-cyber #write-actions,
+App.theme-cyber #af-bottom,
+App.theme-cyber #exp-header,
+App.theme-cyber UserResult,
+App.theme-cyber #exp-bottom,
+App.theme-cyber #sounds-header,
+App.theme-cyber SoundCard,
+App.theme-cyber #sounds-bottom,
+App.theme-cyber #stories-header,
+App.theme-cyber #viewer-box,
+App.theme-cyber #stories-bottom,
+App.theme-cyber #settings-header,
+App.theme-cyber ThemeCard,
+App.theme-cyber #account-section,
+App.theme-cyber #settings-bottom,
+App.theme-cyber #live-header,
+App.theme-cyber LiveCard,
+App.theme-cyber #my-live-panel,
+App.theme-cyber #notif-header,
+App.theme-cyber #notif-bottom,
+App.theme-cyber NotifItem,
+App.theme-cyber #profile-header,
+App.theme-cyber #profile-bottom,
+App.theme-cyber .content-card,
+App.theme-cyber #stream-info-box,
+App.theme-cyber #live-bottom {
+    background: #001500;
+}
+
+/* Dark panel backgrounds */
+App.theme-cyber #sidebar,
+App.theme-cyber #chat-panel,
+App.theme-cyber #feed-panel,
+App.theme-cyber #dash-nav,
+App.theme-cyber #feed-tabs,
+App.theme-cyber #cat-bar,
+App.theme-cyber #search-row,
+App.theme-cyber #type-bar,
+App.theme-cyber #bubbles-panel,
+App.theme-cyber #trending-panel,
+App.theme-cyber #player-bar,
+App.theme-cyber #hint-bar,
+App.theme-cyber #voice-bar,
+App.theme-cyber #story-viewer,
+App.theme-cyber #lives-panel,
+App.theme-cyber #stats-row,
+App.theme-cyber #profile-tabs,
+App.theme-cyber #filter-bar {
+    background: #000d00;
+}
+
+/* Border/secondary bg widgets */
+App.theme-cyber StoryBubble,
+App.theme-cyber .story-circle,
+App.theme-cyber #player-controls Button,
+App.theme-cyber MarkdownFence {
+    background: #003300;
+}
+
+/* Hover states */
+App.theme-cyber VideoCard:hover,
+App.theme-cyber PostCard:hover,
+App.theme-cyber SoundCard:hover,
+App.theme-cyber ThemeCard:hover,
+App.theme-cyber LiveCard:hover,
+App.theme-cyber UserResult:hover {
+    background: #002200;
+}
+
+/* Primary accent — text colours */
+App.theme-cyber #feed-title,
+App.theme-cyber #chat-title,
+App.theme-cyber #af-title,
+App.theme-cyber #exp-title,
+App.theme-cyber #sounds-title,
+App.theme-cyber #stories-title,
+App.theme-cyber #settings-title,
+App.theme-cyber #live-title,
+App.theme-cyber #notif-title,
+App.theme-cyber #username-line,
+App.theme-cyber #avatar-icon,
+App.theme-cyber .stat-number,
+App.theme-cyber #my-live-title,
+App.theme-cyber #viewer-author,
+App.theme-cyber #viewer-user,
+App.theme-cyber #conv-username,
+App.theme-cyber #voice-status,
+App.theme-cyber MarkdownH1,
+App.theme-cyber MarkdownH2,
+App.theme-cyber MarkdownH3 {
+    color: #00ff41;
+}
+
+/* Secondary accent — text colours */
+App.theme-cyber #contacts-label,
+App.theme-cyber #activity-title,
+App.theme-cyber #trending-title,
+App.theme-cyber #badge-line,
+App.theme-cyber .section-header {
+    color: #00cc33;
+}
+
+/* Primary accent — borders on hover/active */
+App.theme-cyber VideoCard:hover,
+App.theme-cyber PostCard:hover,
+App.theme-cyber SoundCard:hover,
+App.theme-cyber ThemeCard:hover,
+App.theme-cyber LiveCard:hover,
+App.theme-cyber UserResult:hover,
+App.theme-cyber StoryBubble,
+App.theme-cyber #viewer-box,
+App.theme-cyber #player-bar,
+App.theme-cyber #voice-bar {
+    border: solid #00ff41;
+}
+
+App.theme-cyber #feed-tabs Button.tab-active,
+App.theme-cyber #cat-bar Button.cat-active,
+App.theme-cyber #type-bar Button.type-active {
+    color: #00ff41;
+    border-bottom: solid #00ff41;
+}
+
+App.theme-cyber #theme-btns Button.theme-btn-active {
+    background: #00ff41;
+    color: #000;
+}
+
+App.theme-cyber #msg-list MsgItem.mine {
+    background: #001500;
+    border-right: solid #00ff41;
+}
+
+App.theme-cyber #msg-list MsgItem.theirs {
+    background: #000d00;
+    border-left: solid #00cc33;
+}
+
+App.theme-cyber #conv-list ConvItem.--highlight {
+    background: #002200;
+    border-left: solid #00ff41;
+}
+
+App.theme-cyber ThemeCard.theme-selected,
+App.theme-cyber PostCard.--highlight,
+App.theme-cyber SoundCard.--highlight,
+App.theme-cyber VideoCard.--highlight {
+    border: solid #00ff41;
+    background: #002200;
+}
+
+App.theme-cyber #voice-bar {
+    background: #001500;
+    border-top: solid #00ff41;
+}
+
+/* ─── OCEAN per-screen ──────────────────────────────────────────────────────── */
+
+/* Panel / header backgrounds */
+App.theme-ocean #dash-header,
+App.theme-ocean StatCard,
+App.theme-ocean #add-story-btn,
+App.theme-ocean #feed-header,
+App.theme-ocean VideoCard,
+App.theme-ocean #feed-bottom,
+App.theme-ocean #chat-header,
+App.theme-ocean #conversation-header,
+App.theme-ocean #input-area,
+App.theme-ocean #af-header,
+App.theme-ocean PostCard,
+App.theme-ocean #viewer-header,
+App.theme-ocean #viewer-actions,
+App.theme-ocean #write-header,
+App.theme-ocean #write-actions,
+App.theme-ocean #af-bottom,
+App.theme-ocean #exp-header,
+App.theme-ocean UserResult,
+App.theme-ocean #exp-bottom,
+App.theme-ocean #sounds-header,
+App.theme-ocean SoundCard,
+App.theme-ocean #sounds-bottom,
+App.theme-ocean #stories-header,
+App.theme-ocean #viewer-box,
+App.theme-ocean #stories-bottom,
+App.theme-ocean #settings-header,
+App.theme-ocean ThemeCard,
+App.theme-ocean #account-section,
+App.theme-ocean #settings-bottom,
+App.theme-ocean #live-header,
+App.theme-ocean LiveCard,
+App.theme-ocean #my-live-panel,
+App.theme-ocean #notif-header,
+App.theme-ocean #notif-bottom,
+App.theme-ocean NotifItem,
+App.theme-ocean #profile-header,
+App.theme-ocean #profile-bottom,
+App.theme-ocean .content-card,
+App.theme-ocean #stream-info-box,
+App.theme-ocean #live-bottom {
+    background: #021024;
+}
+
+/* Dark panel backgrounds */
+App.theme-ocean #sidebar,
+App.theme-ocean #chat-panel,
+App.theme-ocean #feed-panel,
+App.theme-ocean #dash-nav,
+App.theme-ocean #feed-tabs,
+App.theme-ocean #cat-bar,
+App.theme-ocean #search-row,
+App.theme-ocean #type-bar,
+App.theme-ocean #bubbles-panel,
+App.theme-ocean #trending-panel,
+App.theme-ocean #player-bar,
+App.theme-ocean #hint-bar,
+App.theme-ocean #voice-bar,
+App.theme-ocean #story-viewer,
+App.theme-ocean #lives-panel,
+App.theme-ocean #stats-row,
+App.theme-ocean #profile-tabs,
+App.theme-ocean #filter-bar {
+    background: #010b1a;
+}
+
+/* Border/secondary bg widgets */
+App.theme-ocean StoryBubble,
+App.theme-ocean .story-circle,
+App.theme-ocean #player-controls Button,
+App.theme-ocean MarkdownFence {
+    background: #0a2a4a;
+}
+
+/* Hover states */
+App.theme-ocean VideoCard:hover,
+App.theme-ocean PostCard:hover,
+App.theme-ocean SoundCard:hover,
+App.theme-ocean ThemeCard:hover,
+App.theme-ocean LiveCard:hover,
+App.theme-ocean UserResult:hover {
+    background: #051530;
+}
+
+/* Primary accent — text colours */
+App.theme-ocean #feed-title,
+App.theme-ocean #chat-title,
+App.theme-ocean #af-title,
+App.theme-ocean #exp-title,
+App.theme-ocean #sounds-title,
+App.theme-ocean #stories-title-lbl,
+App.theme-ocean #settings-title,
+App.theme-ocean #live-title,
+App.theme-ocean #notif-title,
+App.theme-ocean #username-line,
+App.theme-ocean #viewer-author,
+App.theme-ocean #viewer-user,
+App.theme-ocean #conv-username,
+App.theme-ocean #voice-status,
+App.theme-ocean MarkdownH1,
+App.theme-ocean MarkdownH2,
+App.theme-ocean MarkdownH3 {
+    color: #4dabf7;
+}
+
+/* Secondary accent — text colours */
+App.theme-ocean #contacts-label,
+App.theme-ocean #activity-title,
+App.theme-ocean #trending-title,
+App.theme-ocean .section-header,
+App.theme-ocean #stories-title {
+    color: #00e5ff;
+}
+
+/* Primary accent — borders on hover/active */
+App.theme-ocean VideoCard:hover,
+App.theme-ocean PostCard:hover,
+App.theme-ocean SoundCard:hover,
+App.theme-ocean ThemeCard:hover,
+App.theme-ocean LiveCard:hover,
+App.theme-ocean UserResult:hover,
+App.theme-ocean StoryBubble,
+App.theme-ocean #viewer-box,
+App.theme-ocean #player-bar,
+App.theme-ocean #voice-bar {
+    border: solid #4dabf7;
+}
+
+App.theme-ocean #feed-tabs Button.tab-active,
+App.theme-ocean #cat-bar Button.cat-active,
+App.theme-ocean #type-bar Button.type-active {
+    color: #4dabf7;
+    border-bottom: solid #4dabf7;
+}
+
+App.theme-ocean #theme-btns Button.theme-btn-active {
+    background: #4dabf7;
+    color: #000;
+}
+
+App.theme-ocean #msg-list MsgItem.mine {
+    background: #021024;
+    border-right: solid #4dabf7;
+}
+
+App.theme-ocean #msg-list MsgItem.theirs {
+    background: #010b1a;
+    border-left: solid #00e5ff;
+}
+
+App.theme-ocean #conv-list ConvItem.--highlight {
+    background: #051530;
+    border-left: solid #4dabf7;
+}
+
+App.theme-ocean ThemeCard.theme-selected,
+App.theme-ocean PostCard.--highlight,
+App.theme-ocean SoundCard.--highlight,
+App.theme-ocean VideoCard.--highlight {
+    border: solid #4dabf7;
+    background: #051530;
+}
+
+App.theme-ocean #voice-bar {
+    background: #001224;
+    border-top: solid #4dabf7;
+}
+
+/* ─── SUNSET per-screen ─────────────────────────────────────────────────────── */
+
+/* Panel / header backgrounds */
+App.theme-sunset #dash-header,
+App.theme-sunset StatCard,
+App.theme-sunset #add-story-btn,
+App.theme-sunset #feed-header,
+App.theme-sunset VideoCard,
+App.theme-sunset #feed-bottom,
+App.theme-sunset #chat-header,
+App.theme-sunset #conversation-header,
+App.theme-sunset #input-area,
+App.theme-sunset #af-header,
+App.theme-sunset PostCard,
+App.theme-sunset #viewer-header,
+App.theme-sunset #viewer-actions,
+App.theme-sunset #write-header,
+App.theme-sunset #write-actions,
+App.theme-sunset #af-bottom,
+App.theme-sunset #exp-header,
+App.theme-sunset UserResult,
+App.theme-sunset #exp-bottom,
+App.theme-sunset #sounds-header,
+App.theme-sunset SoundCard,
+App.theme-sunset #sounds-bottom,
+App.theme-sunset #stories-header,
+App.theme-sunset #viewer-box,
+App.theme-sunset #stories-bottom,
+App.theme-sunset #settings-header,
+App.theme-sunset ThemeCard,
+App.theme-sunset #account-section,
+App.theme-sunset #settings-bottom,
+App.theme-sunset #live-header,
+App.theme-sunset LiveCard,
+App.theme-sunset #my-live-panel,
+App.theme-sunset #notif-header,
+App.theme-sunset #notif-bottom,
+App.theme-sunset NotifItem,
+App.theme-sunset #profile-header,
+App.theme-sunset #profile-bottom,
+App.theme-sunset .content-card,
+App.theme-sunset #stream-info-box,
+App.theme-sunset #live-bottom {
+    background: #190e22;
+}
+
+/* Dark panel backgrounds */
+App.theme-sunset #sidebar,
+App.theme-sunset #chat-panel,
+App.theme-sunset #feed-panel,
+App.theme-sunset #dash-nav,
+App.theme-sunset #feed-tabs,
+App.theme-sunset #cat-bar,
+App.theme-sunset #search-row,
+App.theme-sunset #type-bar,
+App.theme-sunset #bubbles-panel,
+App.theme-sunset #trending-panel,
+App.theme-sunset #player-bar,
+App.theme-sunset #hint-bar,
+App.theme-sunset #voice-bar,
+App.theme-sunset #story-viewer,
+App.theme-sunset #lives-panel,
+App.theme-sunset #stats-row,
+App.theme-sunset #profile-tabs,
+App.theme-sunset #filter-bar {
+    background: #100a1a;
+}
+
+/* Border/secondary bg widgets */
+App.theme-sunset StoryBubble,
+App.theme-sunset .story-circle,
+App.theme-sunset #player-controls Button,
+App.theme-sunset MarkdownFence {
+    background: #2a1a3a;
+}
+
+/* Hover states */
+App.theme-sunset VideoCard:hover,
+App.theme-sunset PostCard:hover,
+App.theme-sunset SoundCard:hover,
+App.theme-sunset ThemeCard:hover,
+App.theme-sunset LiveCard:hover,
+App.theme-sunset UserResult:hover {
+    background: #1a1025;
+}
+
+/* Primary accent — text colours */
+App.theme-sunset #feed-title,
+App.theme-sunset #chat-title,
+App.theme-sunset #af-title,
+App.theme-sunset #exp-title,
+App.theme-sunset #sounds-title,
+App.theme-sunset #stories-title-lbl,
+App.theme-sunset #settings-title,
+App.theme-sunset #live-title,
+App.theme-sunset #notif-title,
+App.theme-sunset #username-line,
+App.theme-sunset #viewer-author,
+App.theme-sunset #viewer-user,
+App.theme-sunset #conv-username,
+App.theme-sunset #voice-status,
+App.theme-sunset MarkdownH1,
+App.theme-sunset MarkdownH2,
+App.theme-sunset MarkdownH3 {
+    color: #f59f00;
+}
+
+/* Secondary accent — text colours */
+App.theme-sunset #contacts-label,
+App.theme-sunset #activity-title,
+App.theme-sunset #trending-title,
+App.theme-sunset .section-header,
+App.theme-sunset #stories-title {
+    color: #845ef7;
+}
+
+/* Primary accent — borders on hover/active */
+App.theme-sunset VideoCard:hover,
+App.theme-sunset PostCard:hover,
+App.theme-sunset SoundCard:hover,
+App.theme-sunset ThemeCard:hover,
+App.theme-sunset LiveCard:hover,
+App.theme-sunset UserResult:hover,
+App.theme-sunset StoryBubble,
+App.theme-sunset #viewer-box,
+App.theme-sunset #player-bar,
+App.theme-sunset #voice-bar {
+    border: solid #f59f00;
+}
+
+App.theme-sunset #feed-tabs Button.tab-active,
+App.theme-sunset #cat-bar Button.cat-active,
+App.theme-sunset #type-bar Button.type-active {
+    color: #f59f00;
+    border-bottom: solid #f59f00;
+}
+
+App.theme-sunset #theme-btns Button.theme-btn-active {
+    background: #f59f00;
+    color: #000;
+}
+
+App.theme-sunset #msg-list MsgItem.mine {
+    background: #190e22;
+    border-right: solid #f59f00;
+}
+
+App.theme-sunset #msg-list MsgItem.theirs {
+    background: #100a1a;
+    border-left: solid #845ef7;
+}
+
+App.theme-sunset #conv-list ConvItem.--highlight {
+    background: #1a1025;
+    border-left: solid #f59f00;
+}
+
+App.theme-sunset ThemeCard.theme-selected,
+App.theme-sunset PostCard.--highlight,
+App.theme-sunset SoundCard.--highlight,
+App.theme-sunset VideoCard.--highlight {
+    border: solid #f59f00;
+    background: #1a1025;
+}
+
+App.theme-sunset #voice-bar {
+    background: #1a0a0a;
+    border-top: solid #f59f00;
+}
+

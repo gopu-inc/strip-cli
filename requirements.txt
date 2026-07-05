@@ -1,5 +1,5 @@
-# requirements.txt pour STRIP TUI
-textual
+# STRIP TUI — dépendances
+textual>=0.47.0
 rich
 requests
 python-dotenv
